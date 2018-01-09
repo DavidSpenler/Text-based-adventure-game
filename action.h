@@ -17,6 +17,7 @@ class action {
 	map<string,bool> a_conditions;
 	map<string,string> a_fails;
 	string play_sequence(string);
+	string play_death(string);
 	public:
 		action(const string&,const string&,map<string,bool> c={},int=-1,map<string,bool> d={},map<string,string> f={});
 		string init_result();

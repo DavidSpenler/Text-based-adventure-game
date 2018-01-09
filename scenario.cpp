@@ -5,11 +5,11 @@
 #include "scenario.h"
 #include "action.h"
 #include "data.h"
+#include "files.h"
 
 using namespace std;
 
 typedef map<string,string>::iterator it_type;
-
 
 scenario::scenario(const string& a, vector<action> b) {
 	desc = a;
@@ -97,6 +97,26 @@ string scenario::print_inventory() {
 }
 
 string scenario::take_action(string action) {
+
+	if (action.substr(0,4) == "load") {
+		switch(action.at(action.length()-1)) {
+			case '1': load_data(1); break;
+			case '2': load_data(2); break;
+			case '3': load_data(3); break;
+			default: return "Invalid save file"; break;
+		}
+		return scenarios[scenario_num].describe_scene();
+	}
+	if (action.substr(0,4) == "save") {
+		switch(action.at(action.length()-1)) {
+			case '1': save_data(1); break;
+			case '2': save_data(2); break;
+			case '3': save_data(3); break;
+			default: return "Invalid save file"; break;
+		} 
+		return "File saved";
+	}
+
 	vector<string> action_words = segment(action);
 	string core_action;
 	bool matched = false;
@@ -118,6 +138,10 @@ string scenario::take_action(string action) {
 	cout << "'" << action << "', read as '" << core_action << "'" << endl;
 	if (check_match(core_action,"*look inventory") == true) {
 		return print_inventory();
+	}
+	if (check_match(core_action,"restart")) {
+		//load_data(0);
+		return scenarios[scenario_num].describe_scene();
 	}
 	for (it_type iterator = inventory.begin();iterator != inventory.end();iterator++) {
 		if (core_action == "look "+iterator->first && conditions["has_"+iterator->first] == true) {

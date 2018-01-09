@@ -71,19 +71,12 @@ string action::play_sequence(string text) {
 			mark = substring.find('|');
 			system("clear");
 		}
-		if (substring[0] == '#') {
-			return play_death(substring);
-		}
-		else {
-			return substring;
-		}
+		return substring;
 }
 
 string action::play_death(string text) {
 	cout << text.substr(1,text.length()-1) << "(Press enter to continue)" << endl;
-	string cont;
-	getline(cin,cont);
-	system("clear");
-	scenario_num = -1;
-	return "You are dead. Type 'restart' to start a new game. or load 1,2,3 to restore a saved game from one of three files";
+	cout << "You are dead. Type 'restart' to start a new game. or load 1,2,3 to restore a saved game from one of three files
+	return text.substr(1,text.length()-1);
+	
 }
