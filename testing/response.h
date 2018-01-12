@@ -10,11 +10,13 @@ using namespace std;
 #define RESPONSE
 
 struct response {
-	string response;
-	vector<map<string,bool>> conditions;
-	vector<map<string,bool>> changes;
+	string response_text;
+	map<string,bool> conditions;
+	map<string,bool> changes;
 	int scene_change;
-	response(string,vector<map<string,bool>><vector<map<string,bool>>,int);
+	int condition_code;
+	response(string,map<string,bool>,map<string,bool>,int);
+	void build_condition_code();
 };
 
 #endif

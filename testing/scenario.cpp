@@ -10,7 +10,6 @@
 using namespace std;
 
 typedef map<string,string>::iterator it_type;
-typedef map<string,bool>::iterator it_type2;
 
 scenario::scenario(const string& a, vector<action> b) {
 	desc = a;
@@ -19,6 +18,7 @@ scenario::scenario(const string& a, vector<action> b) {
 }
 	 
 vector<action> scenario::add_variances(vector<action> a) {
+	
 	vector<action> actions;
 	vector<action> new_actions;	
 	for (int x;x<a.size();++x) {
@@ -97,6 +97,7 @@ string scenario::print_inventory() {
 }
 
 string scenario::take_action(string action) {
+
 	if (action.substr(0,4) == "load") {
 		switch(action.at(action.length()-1)) {
 			case '1': load_data(1); break;
@@ -139,7 +140,7 @@ string scenario::take_action(string action) {
 		return print_inventory();
 	}
 	if (check_match(core_action,"restart")) {
-		load_data(0);
+		//load_data(0);
 		return scenarios[scenario_num].describe_scene();
 	}
 	for (it_type iterator = inventory.begin();iterator != inventory.end();iterator++) {
@@ -150,9 +151,6 @@ string scenario::take_action(string action) {
 	for (int i=0;i<valid_actions.size();++i) {
 		if (check_match(core_action,valid_actions[i].get_action_trigger()) == true) {
 			string response = valid_actions[i].init_result();
-			if (response == "_next_") {
-				continue;
-			}
 			return response;
 		}
 	}

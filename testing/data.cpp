@@ -53,12 +53,10 @@ vector<vector<string>> synonyms = {
 	{"throne","seat"},
 	{"baron","king","lord"},
 	{"gardener"},
-	{"flip","turn","pull","flick"},
-	{"lever","switch"}
+	
 };
 
 map<string,bool> conditions = {
-	{},
 	{"has_bone",false},
 	{"used_bone",false},
 	{"broke_cuffs",false},
@@ -86,23 +84,25 @@ map<string,string> inventory = {
 	{"chamberpot","The pot is black and has a rounded rim."},
 	{"armour","The suit consists of a chestplate, helmet, and sleeves as well as leg pieces."},
 	{"sceptre","The sceptre's handle is made of solid gold and is headed by a large glistening ruby."},
-	{"shovel","It is a fairly mundane shovel made of wood and metal. It seems to have been used excessively."}
+	{"shovel","It is a fairly mundane shovel made of wood and metal. It seems to have been used excessively."},
+	{}
 };
 
 vector<action> universal_fails = {
-	action("get","Get what?"),
-	action("get <any>","You can't get that."),
-	action("use","Use what?"),
-	action("use <any>","How would you use that?"),
-	action("use <any> <any>","You can't use that on that"),
-	action("talk","Talk to who?"),
-	action("look","Look at what?"),
-	action("help","Type commands to perform actions. For example: TALK to person, GET item, DO this WITH item, or anything else that would suit the situation. Type 'look around' to get a recap of your current surroundings. Type 'save' 1,2,3 to save your progress and 'load' 1,2,3 to load it back. Type 'quit' to exit"),
-	action("<any>","That doesn't seem possible")
+	action("get",{"Get what?"}),
+	action("get <any>",{"You can't get that."}),
+	action("use",{"Use what?"}),
+	action("use <any>",{"How would you use that?"}),
+	action("use <any> <any>",{"You can't use that on that"}),
+	action("talk",{"Talk to who?"}),
+	action("look",{"Look at what?"}),
+	action("help",{"Type commands to perform actions. For example: TALK to person, GET item, DO this WITH item, or anything else that would suit the situation. Type 'look around' to get a recap of your current surroundings. Type 'save' 1,2,3 to save your progress and 'load' 1,2,3 to load it back. Type 'quit' to exit"}),
+	action("<any>",{"That doesn't seem possible"})
 };
 
 vector<scenario> scenarios = {
 	scenario(
+/*	scenario(
 		"You find youself in a dark room, restrained by cuffs. The walls surrounding you are covered with spikes and seem to be closing in. To your left is a skeleton of some unknown creature. a door in front of you stands north",
 		{
 			action("look around","You find youself in a dark room, restrained by cuffs. The walls surrounding you are covered with spikes and seem to be closing in. To your left is a skeleton of some unknown creature. A door in front of you stands north.",{{}},-1,{{"used_bone",false},{"broke_cuffs",false}},{{"used_bone","You find youself in a dark room, restrained by cuffs. The walls surrounding you are covered with spikes. To your left is a skeleton of some unknown creature. A door in front of you stands north."},{"broke_cuffs","You find youself in a dark room. The walls surrounding you are covered with spikes. To your left is a skeleton of some unknown creature. A door in front of you stands north."}}),
@@ -128,7 +128,7 @@ vector<scenario> scenarios = {
 		{
 			action("look around","You find yourself in a damp stone hallway faintly illuminated by narrow windows and that runs east to west. The door to your cell lies south. You hear footsteps coming from the west"),
 			action("*go south","",{{}},0,{{}},{{}}),
-			action("*go west","|You run into a group of armed guards. |When they see the sceptre that you are holding they immediately clear the way.",{{}},4,{{"applied_suit",true},{"has_sceptre",true}},{{"applied_suit","#You run into a group of armed guards who after finding you have not met with your demise quickly impale with their spears."},{"has_sceptre","|You run into a group of armed guards. They immediately ask where you are going and for what purpose. |Not knowing what to say, they pry the helmet from your head, revealing your identity|#They impale you with their spears and leave you to die."}}),
+			action("*go west","|You run into a group of armed guards. When they see the sceptre that you are holding they immediately clear the way.",{{}},4,{{"applied_suit",true},{"has_sceptre",true}},{{"applied_suit","#You run into a group of armed guards who after finding you have not met with your demise quickly impale with their spears."},{"has_sceptre","|You run into a group of armed guards. They immediately ask where you are going and for what purpose. |Not knowing what to say, they pry the helmet from your head, revealing your identity|#They impale you with their spears and leave you to die."}}),
 			action("*go east","",{{}},2,{{}},{{}}),
 		}
 	),
@@ -171,7 +171,7 @@ vector<scenario> scenarios = {
 			action("look hills","The eloquent hills are a mark of the beautiful landscape."),
 			action("look castle","The castle is composed of large cobble-stone blocks, standing at least 30 meters high, with its turrets soaring to the skies. Taking note of the lack of windows, you are glad to finally be out of it."),
 			action("*go south","You wish not to return to the castle whose lord imprisoned you."),
-			action("*go north","|You made your way down the dirt road, still rought with fatigue and hunger from your harsh imprisonment| As you walk you take another gander at the sceptre you swindled from your incarcerator's castle. A closer inspection of it gives you a lapse of clarity as you remember why you ended up in the dungeon.| You are a travelling villein looking for work after being expelled from your fief. The baron of St. Aliquis had promised you work on his barony if you returned to him the sceptre he had lost to a feudal skirmish with the duke of Quelqueparte.| You hasten your pace as realize his hospility will soon be yours.",{{}},5)
+			action("*go north","|You made your way down the dirt road, still rought with fatigue and hunger from your harsh imprisonment| As you walk you take another gander at the sceptre you swindled from your incarcerator's castle. A closer inspection of it gives you a lapse of clarity as you remember why you ended up in the dungeon.| You are a travelling villein looking for work after being expelled from your fief. The baron of St. Aliquis had promised you work on his barony if you returned to him the sceptre he had lost to a feudal skirmish with the duke of Quelqueparte.| You hasten your pace as realize his hospility will soon be yours.|",{{}},5)
 		}
 	),
 	scenario(
@@ -215,11 +215,9 @@ vector<scenario> scenarios = {
 	scenario(
 		"",
 		{
-			action("look around","You appear to have wondered into a blank void. Pure white spans in all directions (although you came from the west). A lever stands in the center of your field of vision"),
-			action("flip lever","You flip the lever ON",{{"lever_on",true}},-1,{{"lever_on",false}},{{"lever_on","_next_"}}),
-			action("flip lever","You flip the lever OFF",{{"lever_on",false}},-1,{{"lever_on",true}},{{"lever_on","_next_"}}),
+			action("look around","You find yourself at the outset of a chiming forest. There is a cave distantly east.")
 		}
 	)
-};
+};*/
 
 int scenario_num = 0;

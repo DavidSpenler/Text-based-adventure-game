@@ -1,0 +1,16 @@
+#include <string>
+
+using namespace std;
+
+new_map::new_map(string a, bool b) {
+	first = a;
+	second = b;
+}
+
+string get_first() {
+	return first;
+}
+
+bool get_second() {
+	return second;
+}

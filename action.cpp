@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <map>
+#include <utility>
 #include <initializer_list>
 
 #include "action.h"
@@ -10,7 +11,7 @@
 
 using namespace std;
 
-action::action(const string& a,const string& b,map<string,bool> c, int d,map<string,bool> e,map<string,string> f) {
+action::action(const string& a,const string& b,map<string,bool> c, int d,vector<pair<string,bool>> e,map<string,string> f) {
 	action_trigger = a;
 	success_desc = b;
 	changes = c;
@@ -21,34 +22,38 @@ action::action(const string& a,const string& b,map<string,bool> c, int d,map<str
 
 string action::init_result() {
 	typedef map<string,bool>::iterator it_type;
-	for (it_type iterator = a_conditions.begin(); iterator != a_conditions.end(); iterator++) {
-		if (conditions[iterator->first] != iterator->second) {
-			string failure = a_fails[iterator->first];
-			if (failure[0] == '|') {
-				return play_sequence(failure);
-			}
-			else if (failure[0] == '#') {
-				return play_death(failure);
+	string response = success_desc;
+	bool valid = true;
+	for (int i=0; i < a_conditions.size(); i++) {
+		if (conditions[a_conditions[i].first] != a_conditions[i].second) {
+			response = a_fails[a_conditions[i].first];
+			valid = false;
+		}
+	}
+	if (valid) {
+		for (it_type iterator = changes.begin(); iterator != changes.end(); iterator++) {
+			conditions[iterator->first]=iterator->second;
+		}
+		if (scene_change != -1) {
+			scenario_num = scene_change;
+		}
+	}
+	if (response[0] == '#') {
+		return play_death(response);
+	}
+	if (response[0] == '|') {
+			if (scene_change != -1 && valid) {
+				response = play_sequence(response+"|");
 			}
 			else {
-				return failure; 
+				response = play_sequence(response);
 			}
-		}
 	}
-	for (it_type iterator = changes.begin(); iterator != changes.end(); iterator++) {
-		conditions[iterator->first]=iterator->second;
-	}
-	if (scene_change != -1) {
-		scenario_num = scene_change;
-		if (success_desc[0] != '|') {
-			return scenarios[scenario_num].describe_scene();
-		}
-	}
-	if (success_desc[0] == '|') {
-		return play_sequence(success_desc);
+	if (scene_change != -1 && valid) {
+		return scenarios[scenario_num].describe_scene();
 	}
 	else {
-		return success_desc;
+		return response;
 	}
 }
 
@@ -80,7 +85,7 @@ string action::play_sequence(string text) {
 }
 
 string action::play_death(string text) {
-	cout << text.substr(1,text.length()-1) << "(Press enter to continue)" << endl;
+	cout << text.substr(1,text.length()-1) << endl << "(Press enter to continue)" << endl;
 	string cont;
 	getline(cin,cont);
 	system("clear");
