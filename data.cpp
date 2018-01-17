@@ -27,6 +27,7 @@ vector<vector<string>> synonyms = {
 	{"start","begin"},
 	{"suit","suits","armour","statue","statues"},
 	{"window"},
+	{"glass"},
 	{"knock"},
 	{"open"},
 	{"wear","apply"},
@@ -54,7 +55,26 @@ vector<vector<string>> synonyms = {
 	{"baron","king","lord"},
 	{"gardener"},
 	{"flip","turn","pull","flick"},
-	{"lever","switch"}
+	{"lever","switch"},
+	{"lantern","candle","light"},
+	{"hole"},
+	{"grave","graves"},
+	{"tombstone","tomb"},
+	{"abbey","church"},
+	{"tree"},
+	{"climb","ascend"},
+	{"descend","down"},
+	{"tie","wrap"},
+	{"house","houses"},
+	{"dig"},
+	{"gravekeeper","gravekeep"},
+	{"give"},
+	{"shovel"},
+	{"desk"},
+	{"drawer"},
+	{"note","notes","diary"},
+	{"bed","mattress"},
+	{"under","beneath"}
 };
 
 map<string,bool> conditions = {
@@ -71,6 +91,9 @@ map<string,bool> conditions = {
 	{"has_shovel",false},
 	{"got_quest",false},
 	{"has_brooch",false},
+	{"has_lantern",false},
+	{"tied_rope",false},
+	{"in_tree",false},
 	{"has_mallet",false},
 	{"has_meat",false},
 	{"has_crucifix",false},
@@ -78,7 +101,8 @@ map<string,bool> conditions = {
 	{"has_sword",false},
 	{"has_torch",false},
 	{"has_rope",false},
-	{"has_flute",false}
+	{"has_flute",false},
+	{"gave_shovel",false}
 };
 
 map<string,string> inventory = {
@@ -86,8 +110,13 @@ map<string,string> inventory = {
 	{"chamberpot","The pot is black and has a rounded rim."},
 	{"armour","The suit consists of a chestplate, helmet, and sleeves as well as leg pieces."},
 	{"sceptre","The sceptre's handle is made of solid gold and is headed by a large glistening ruby."},
-	{"shovel","It is a fairly mundane shovel made of wood and metal. It seems to have been used excessively."}
+	{"brooch","The brooch consists of a red crystal surrounded by beads of gold"},
+	{"shovel","It is a fairly mundane shovel made of wood and metal. It seems to have been used excessively."},
+	{"lantern","The lantern is made of a cheap metal, as evidenced by its many dents. Inside the cage is a small wax candle"},
+	{"rope","The rope is reasonably thick and stretches about 5 meters"},
+	{"",""},
 };
+
 
 vector<action> universal_fails = {
 	action("get","Get what?"),
@@ -95,6 +124,7 @@ vector<action> universal_fails = {
 	action("use","Use what?"),
 	action("use <any>","How would you use that?"),
 	action("use <any> <any>","You can't use that on that"),
+	action("give <any>","You don't have that"),
 	action("talk","Talk to who?"),
 	action("look","Look at what?"),
 	action("help","Type commands to perform actions. For example: TALK to person, GET item, DO this WITH item, or anything else that would suit the situation. Type 'look around' to get a recap of your current surroundings. Type 'save' 1,2,3 to save your progress and 'load' 1,2,3 to load it back. Type 'quit' to exit"),
@@ -152,7 +182,7 @@ vector<scenario> scenarios = {
 	scenario(
 		"",
 		{
-			action("look around","You appear to be in the treasury of the castle. You are surrounded by mounds of glimmering gold and crystal treasures."),
+			action("look around","You appear to be in the treasury of the castle. You are surrounded by mounds of glimmering gold and crystal treasures. Standing erect amongst the mounds of wealth you see a glistening and bedazzled sceptre"),
 			action("look treasure","Gold coins scatter the room, forming a sea of large piles. Within them are assorted objects of the same lustre."),
 			action("get treasure","What treasure shall you take?"),
 			action("get coins","There are too many to carry in your hands, and coins are only valuable in great quantities."),
@@ -177,11 +207,11 @@ vector<scenario> scenarios = {
 	scenario(
 		"",
 		{	
-			action("look around","You find yourself in the  center of the bustling keep of the castle. You see many common men go about their work with much clamour and hubbub. To the north is the great donjon, to the west a group of residential buildings, to the east a marketplace, and to the south the entrance of the castle."),
+			action("look around","You find yourself in the  center of the bustling keep of the castle. You see many common men go about their work with much clamour and hubbub. To the north is the great donjon, to the west a group of residential buildings, to the east the graveyard, and to the south the entrance of the castle."),
 			action("*go north","",{{}},6),
 			action("*go south","",{{}},8),
-			action("*go east","",{{}},9),
-			action("*go west","",{{}},10),
+			action("*go east","",{{}},10),
+			action("*go west","",{{}},11),
 		}
 	),
 	scenario(
@@ -191,6 +221,7 @@ vector<scenario> scenarios = {
 			action("look bushes","The hedges surrounding the donjon are dense both in volume and in vibrant flowers. Patterns of blue, yellow and pink dot the surface of the lush green bushes."),
 			action("check bushes","You reach your hand inside the bushes, and to your wonder discover... A shovel! Seeing no one around to be using it otherwise, you decide to borrow it for the time being",{{"has_shovel",true}},-1,{{"has_shovel",false}},{{"has_shovel","You reach into the bush... and find nothing."}}),
 			action("talk gardener","'I saw her rise from her grave!', he wails. 'The witch walks the earth!' You take a few steps back."),
+			action("talk gardener witch","He continue to ramble incoherently"),
 			action("*go north","",{{}},7),
 			action("*go south","",{{}},5)
 		}
@@ -209,15 +240,60 @@ vector<scenario> scenarios = {
 	scenario(
 		"",
 		{
-			action("look around","You find yourself at the outset of a chiming forest. There is a cave distantly east.")
+			action("look around","You find yourself at the outset of a chiming forest. A fallen tree trunk obstructs a path into the woods. Remnants of an abandoned encampment are strewn about on the ground There is a cave distantly east."),
+			action("look ground","")
 		}
 	),
 	scenario(
 		"",
 		{
-			action("look around","You appear to have wondered into a blank void. Pure white spans in all directions (although you came from the west). A lever stands in the center of your field of vision"),
+			action("look around","The interior of the cave is pitch black. Through the echo of your motions you discern it is of great size.",{{}},-1,{{"used_lantern",false}},{{"used_lantern",""}}),
+		}
+	),
+	scenario(
+		"",
+		{
+			action("look around","You find yourself in a desolate grave yard. In the centre of the field is the abbey, to the north, on top of which crouches a menacing gargoyle. To the left is a tombstone which appears to have been dug up. A crooked tree stands tall next to it, and the wind howls through its branches. To the right are a number of other gravestones"),
+			action("look tombstone","The tombstone is tall and decored with wonderful arches and architectural details. Atop where the name and date would logically reside there is a thick layer of dirt. Immediately below it appears as though the ground was unearthed with great fervour."),
+			action("look tree","The tree resembles a witherig old man with an unsteady gait. A nook in its centre peers at you. Swinging in the cool breeze is a creaking lantern with an unlit candle."),
+			action("look grave","These graves are more modest. Attest to the lives of many men who primarily lived in the last century. Among their names are: GALEN GARNIER ALIENOR FRANCOIS, PHILIP BOURBON II"),
+			action("look hole","The approach the hole and peer into it. The extent of it is much deeper than you had thought. Down into the earth your observe claw marks along the cobble-stone walls"),
+			action("*go west","",{},5),
+			action("(go abbey/go north)","",{{}},11,{{"gave_shovel",true}},{{"gave_shovel","It's locked"}}),
+			action("dig *up grave","|With a quick sweeping glance from left to right, you pitch the shovel and begin heaving mound upon mound of dirt from its abode, beaming with greed| After some time you here the clunking of wood against your shovel. You unearth frail a coffin, and break its latches open with relative ease. Inside you find the decomposed body of a monarch past.| He wears a fine robe, and an immensely bejewelled crown. You pry it from his skull, and leap from the earth",{{"has_crown",false}},-1,{{"has_shovel",true},{"gave_shovel",true}},{{"gave_shovel","You draw the shovel but here yelling across the field. 'Ey! Let the dead be dead!', it screams.'"},{"has_shovel","With what will you dig with?"}}),
+			action("talk gravekeeper","You approach the gravekeep and inquire about the witch Hagatha. He doesn't indulge you, instead he complains about having to search for his lost shovel, whilst he should be sleeping for his night shift",{},-1,{{"gave_shovel",false}},{{"gave_shovel","He isn't here"}}),
+			action("give shovel gravekeeper","He makes little more conversation, but musters up a crooked smile and grumbles with glee as he takes the shovel. He waddles back to the abbey, and you think you hear a sentiment of thanks amidst  his mumurs",{{"gave_shovel",true},{"has_shovel",false}},-1,{{"gave_shovel",false},{"has_shovel",true}},{{"has_shovel","You don't have that"},{"gave_shovel","He isn't here"}}),
+			action("go hole","You begin your descent down the hole",{},99,{{"has_rope",true},{"tied_rope",true}},{{"tied_rope","You peer into the hole and find it much deeper than you had initially assumed. In fact it is far too deep to descend safely"}}),
+			action("climb tree","You ascend the oaken tower.",{{"in_tree",true}},-1,{{"in_tree",false},{"gave_shovel",true}},{{"gave_shovel","As you mount yourself to climb you hear yelling across the field. 'Get outta 'there', the gravekeeper cries"},{"in_tree","You are already in the tree"}}),
+			action("*go *climb descend *tree","You carefully make your way down the tree",{{"in_tree",false}},-1,{{"in_tree",true}},{{"in_tree","You are not in the tree"}}),
+			action("get lantern","While clinging to a sturdy branch and with an outstretched arm, you grasp for, and at last grab the lantern",{{"has_lantern",true}},-1,{{"in_tree",true},{"has_lantern",false}},{{"has_lantern","You already have that"},{"in_tree","The lantern is far too high in the tree for you to reach it"}}),
+		}
+	),
+	scenario(
+		"",
+		{
+			action("look around","The shed has bleak stone walls. On the left is a bed, where the gravekeeper sleeps. To the right is a desk"),
+			action("look desk","The desk is large and has many drawers built into it. On top of it is a crumpled note with many tear marks"),
+			action("read note","The note reads: 'October 12: There are many ill forces at work on these grounds. Today the heretic Hagatha's grave was unearthed in a most unnatural fashion. I saw only a struck of lightning, and not long after, she emerged from hell."),
+			action("get note","You don't need it"),
+			action("check drawer","Inside the drawer you find the shovel you gave him. You decide to borrow it once again",{{"has_shovel",true}},-1,{{"has_shovel",false}},{{"has_shovel","There's nothing else there"}}),
+			action("check bed","The bed and its sheets are modest at best. The mattress is suspended high above the ground by its supports"),
+			action("check under bed","You look under the bed and find the second half of the note. It reads: 'October 3, On the request of good duke Louis of Quelqueparte, the late king Phillip II has been buried in this small yard, on account of the civil unrest his reign bred that may stir temptations to desecrate his body, or steal the many regal ornaments his attire dons upon him"),
+		}
+	),
+	scenario(
+		"",
+		{
 			action("flip lever","You flip the lever ON",{{"lever_on",true}},-1,{{"lever_on",false}},{{"lever_on","_next_"}}),
-			action("flip lever","You flip the lever OFF",{{"lever_on",false}},-1,{{"lever_on",true}},{{"lever_on","_next_"}}),
+			action("flip lever","You flip the lever OFF",{{"lever_on",false}},-1,{{"lever_on",true}},{{"lever_on","_next_"}})
+		}
+	),
+	scenario(
+		"",
+		{
+			action("look around","You see three slender houses fit tightly down the lane. The one on the left has a mailbox and a fine finish. The one on the left is tattered, and the door is heavily splintered. The middle is in modest condition."),
+			action("look houses","The residencies have a humble appearance. Thatched-roofs shelter the single story, and the windows panes are imbued with dust and grime."),
+			action("go middle house","")
 		}
 	)
 };
