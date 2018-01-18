@@ -114,7 +114,6 @@ map<string,string> inventory = {
 	{"shovel","It is a fairly mundane shovel made of wood and metal. It seems to have been used excessively."},
 	{"lantern","The lantern is made of a cheap metal, as evidenced by its many dents. Inside the cage is a small wax candle"},
 	{"rope","The rope is reasonably thick and stretches about 5 meters"},
-	{"",""},
 };
 
 
@@ -124,8 +123,11 @@ vector<action> universal_fails = {
 	action("use","Use what?"),
 	action("use <any>","How would you use that?"),
 	action("use <any> <any>","You can't use that on that"),
-	action("give <any>","You don't have that"),
+	action("give","Give what?"),
+	action("give <any>","Who will you give it to?"),
+	action("give <any> <any>","You can't give that"),
 	action("talk","Talk to who?"),
+	action("talk <any>","He isn't here"),
 	action("look","Look at what?"),
 	action("help","Type commands to perform actions. For example: TALK to person, GET item, DO this WITH item, or anything else that would suit the situation. Type 'look around' to get a recap of your current surroundings. Type 'save' 1,2,3 to save your progress and 'load' 1,2,3 to load it back. Type 'quit' to exit"),
 	action("<any>","That doesn't seem possible")
@@ -291,9 +293,13 @@ vector<scenario> scenarios = {
 	scenario(
 		"",
 		{
-			action("look around","You see three slender houses fit tightly down the lane. The one on the left has a mailbox and a fine finish. The one on the left is tattered, and the door is heavily splintered. The middle is in modest condition."),
+			action("look around","You see three slender houses fit tightly down the lane. The one on the left has a mailbox and a fine finish. The one on the left is tattered, and the door is heavily splintered. The middle is in modest condition. On the other side of the street you a store with a sign on it. Down towards the end of the street east is the base of a large clocktower."),
 			action("look houses","The residencies have a humble appearance. Thatched-roofs shelter the single story, and the windows panes are imbued with dust and grime."),
-			action("go middle house","")
+			action("go middle house",""),
+			action("look sign","The sign is gone",{{}},-1,{{"fixed_clock",true}},{{"fixed_clock","The sign says: 'Store opens at noon'"),
+			action("look tower","The tower stands some thirty meters high. is made of a smootly-finished cobblestone. The face of the clock is a marvel of calligraphic art, with arching and spiralling beams signifying and decorating the hours and the hands."),
+			action("(look clock/check time)","The hands of the clock wind slowly and with the frailty of an old man",{{}},-1,{{"fixed_clock",true}},{{"fixed_clock","The time is 11:45 AM. There is no hand to count seconds, but when staring at it you find that the time passes very slowly, if at all."}}),
+			action("*go (west/clocktower)","",{{}},99,{{"opened_door2",true}},{{"opened_door2","The door to the clocktower is locked"}}),
 		}
 	)
 };
