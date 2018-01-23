@@ -49,7 +49,7 @@ vector<vector<string>> synonyms = {
 	{"help"},
 	{"monologue"},
 	{"path","road","route"},
-	{"castle","tower","fortress"},
+	{"castle","tower","fortress","clocktower"},
 	{"bushes","bush","hedge","hedges"},
 	{"throne","seat"},
 	{"baron","king","lord"},
@@ -72,9 +72,16 @@ vector<vector<string>> synonyms = {
 	{"shovel"},
 	{"desk"},
 	{"drawer"},
-	{"note","notes","diary"},
+	{"note","notes","diary","sign"},
 	{"bed","mattress"},
-	{"under","beneath"}
+	{"under","beneath"},
+	{"man","guard","knight"},
+	{"stones","stone","rocks","rock","pebbles"},
+	{"throw","chuck"},
+	{"clock","face"},
+	{"key"},
+	{"unlock"},
+	{"read"}
 };
 
 map<string,bool> conditions = {
@@ -102,7 +109,11 @@ map<string,bool> conditions = {
 	{"has_torch",false},
 	{"has_rope",false},
 	{"has_flute",false},
-	{"gave_shovel",false}
+	{"gave_shovel",false},
+	{"has_stones",false},
+	{"threw_stones",false},
+	{"fixed_clock",false},
+	{"has_key",false},
 };
 
 map<string,string> inventory = {
@@ -114,6 +125,8 @@ map<string,string> inventory = {
 	{"shovel","It is a fairly mundane shovel made of wood and metal. It seems to have been used excessively."},
 	{"lantern","The lantern is made of a cheap metal, as evidenced by its many dents. Inside the cage is a small wax candle"},
 	{"rope","The rope is reasonably thick and stretches about 5 meters"},
+	{"stones","You have a small collection of smooth stones, ranging in colour from light grey to a pale, earthy red"},
+	{"key","The key is a glimmering gold colour"}
 };
 
 
@@ -242,8 +255,15 @@ vector<scenario> scenarios = {
 	scenario(
 		"",
 		{
-			action("look around","You find yourself at the outset of a chiming forest. A fallen tree trunk obstructs a path into the woods. Remnants of an abandoned encampment are strewn about on the ground There is a cave distantly east."),
-			action("look ground","")
+			action("look around","You find yourself at the outset of a chiming forest. An opening into the dense woods faces south. Remnants of an abandoned encampment are strewn about on the ground There is a cave distantly east. The field continues to the west"),
+			action("look ground",""),
+			action("*go (cave/east)","",{{}},99),
+			action("*go west","",{{}},99),
+			action("*go south","|The begin your trek into the cave, map in hand",{{}},99,{{"has_map",true}},{{"has_map","|You enter the abode of the forest.|After wandering for some time, you find yourself back at the entrance to the forest where you began"}}),
+			action("look camp","There are remnants of a fire, including a of charred pieces of wood stacked together, surrounded by a circle of stones. On a nearby tree a rope swings in the breeze, fastened to a high branch."),
+			action("get stones","You grab a few of the stones surrounding the fire pit",{{"has_stones",true}},-1,{{"has_stones",false}},{{"has_stones","You see no need to get more stones"}})
+			action("get rope","You already have that",{},-1,{{"has_rope",true}},{{"has_rope","You rope is fastened to the tree above"}}),
+			action("cut rope sword","You already have that",{{"has_rope",true}},-1,{{"has_rope",false},{"has_sword",true}},{{"has_rope","You already have that"},{"has_sword","You don't have that"}}),
 		}
 	),
 	scenario(
@@ -255,8 +275,44 @@ vector<scenario> scenarios = {
 	scenario(
 		"",
 		{
-			action("look around","You find yourself in a desolate grave yard. In the centre of the field is the abbey, to the north, on top of which crouches a menacing gargoyle. To the left is a tombstone which appears to have been dug up. A crooked tree stands tall next to it, and the wind howls through its branches. To the right are a number of other gravestones"),
-			action("look tombstone","The tombstone is tall and decored with wonderful arches and architectural details. Atop where the name and date would logically reside there is a thick layer of dirt. Immediately below it appears as though the ground was unearthed with great fervour."),
+			action("look around","You are in the wtich Hagatha's lair."),
+		}
+	),
+	scenario(
+		"",
+		{
+			action("look around","You are in an open field, cluttered with pieces of foliage. There is a bush, a stump, and river which runs from north to south. On top of the river stands a martello tower, with gates the passage of the stream running through its ground floor. On the lookout stands a wearing a chainmail vest and a visor."),
+			action("*go east","",{{}},99),
+			action("*go west","The river blocks your path"),
+			action("talk man","He's dead",{{}},-1,{{"threw_rock",true}},{{"threw_rock","You shout in his direction, but you can't seem to get his attention"}}),
+			action("throw stones","Where will you throw them?",{{}},-1,{{"has_stones",true}},{{"has_stones","You don't have that"}}),
+			action("throw stones man","You toss a stone in his general direction. You underestmate your aim. The rock hits him straight in the fall, and he stumbles to the edge of the balcony as he lets out a cry, and ... holy crap! You killed him! He falls to his death on the ground below you. Perhaps you should have chosen a smaller rock",{{"threw_rock",true}},-1,{{"has_stones",true},{"threw_rock",false}},{{"threw_rock","You decide not to further desecrate his corpse"},{"has_stones","You don't have that"}}),
+			action("check (man/body)","You rummage through his pockets and find... a key!",{{"has_key",true}},-1,{{"threw_stones",true},{"has_key",false}},{{"has_key","There's nothing else there"},{"threw_stones","You can't do that"}}),
+		}
+	),
+	scenario(
+		"",
+		{
+			action("look around","You find yourself in a small clearing in the woods whera a small log cabin resides. A man wearing a helmet and grasping a sword sits on the porch, fidgeting with nervous mannerisms.",{},-1,{{"killed_man2",false}},{{"killed_man2","The man lays sprawled out in the porch, tainted with blood"}}),
+			action("talk man","As you call to him his head snaps in your direction. With a shaky voice, he explains: 'We were decimated out there. Let the witch's powers not be underestimated. Out of fifteen men, I was the only to survive her onslaught of satanic magic. I will not dare to face her again, or the baron. But with no army left to fight, her reign will surely never end.'"}}),
+			action("get sword","You ask for the sword, but clutching it to his chest he says: 'What could you need with this? If not I, the king's vassal could not vanquish her, what makes you think you could?'"}}),
+			action("(give/show) brooch *man","You reach into your robes and present him with the shining brooch. His eyes widen and glimmer with its reflection. 'The baron sent you?' He asks, with a hint of exasperation. His mind races. At last, he thrusts the sword into your arms, 'Take this, and don't tell the baron that I'm alive"}},{{"has_sword",true}},{{"has_sword",false}},{{"has_sword","You see no need to show him the brooch again"}}),
+			action("kill man sword","You draw the sword and strike the man in the chest. He keels over onto the floor, sputtering, 'God curse your soul', and dies."}},{{"killed_man2",true}},{{"killed_man",false},{"has_sword"}},{{"killed_man","He's already dead"},{"has_sword","You don't have that"}}),
+			action("check (man/body)","You check his pockets and find ... a key!"}},{{"has_key2",true}},{{"has_key2",false},{"killed_man2",true}},{{"has_key2","You check his pockets and find... nothing"},{"killed_man","Nothing stands out about him"}}),
+	),
+	scenario(
+		"",
+		{
+			action("look around","You find yourself inside the tiny cabin."),
+		}
+	),
+	scenario(
+		"",
+		{
+			action("look around","You find yourself in a desolate grave yard. In the centre of the field is the abbey, to the north, on top of which crouches a menacing gargoyle. To the left is a tombstone which appears to have been dug up. A crooked tree stands tall next to it, and the wind howls through its branches. To the right are a number of other gravestones",{},-1,{{"in_tree",false}},{{"in_tree","You see the field dotted with small gravestones. On the roof of the abbey, you see the gargoyle in all its fearsomenes. Below it are words written along the buttresses of the building"}}),
+			action("look abbey","The abbey is made with modest materials, but with passionate craftsmanship. The arched door has large brass hinges, and the stone rim is marked with many spiralling and tapering designs. the roof features impressive buttresses made of finely chiseled stone",{},-1,{{"in_tree",false}},{{"in_tree","You see words engraved deeply on the roof top 'LET THE HEAVENS WEEP TO THE CALL OF JEHOVAH"}}),
+			action("say jehovah","|With a pensive expression, you loudly utter the lord's name. As your lips close, the scene falls silent.|Suddenly, a flash of lightning shakes the earth. In an instant, the skies are imbued with clouds and the thick sheet of rainfall. Running, you seek shelter under the tree.| After several minutes, the storm abruptly stops. Sunlight bursts into the scene once again.",{{"said_words"}},-1,{{"said_words",false}},{{"said_words","You prefer not to invoke the wrath of the lord a second time"}}),
+			action("look tombstone","The tombstone is tall and decored with wonderful arches and architectural details. Atop where the name and date would logically reside there is a thick layer of dirt. Immediately below it appears as though the ground was unearthed with great fervour.",{},-1,{{"said_words",false}},{{"said_words","look tombstone","The tombstone is tall and decored with wonderful arches and architectural details. Atop the grave you read the following: 'Here lies the wretch, GENEVIEVE of HAGATHA, ?-1220. May she rot in the deepest circle of hell alongside Judas'. Immediately below it appears as though the ground was unearthed with great fervour."}}),
 			action("look tree","The tree resembles a witherig old man with an unsteady gait. A nook in its centre peers at you. Swinging in the cool breeze is a creaking lantern with an unlit candle."),
 			action("look grave","These graves are more modest. Attest to the lives of many men who primarily lived in the last century. Among their names are: GALEN GARNIER ALIENOR FRANCOIS, PHILIP BOURBON II"),
 			action("look hole","The approach the hole and peer into it. The extent of it is much deeper than you had thought. Down into the earth your observe claw marks along the cobble-stone walls"),
@@ -274,6 +330,14 @@ vector<scenario> scenarios = {
 	scenario(
 		"",
 		{
+			action("look around","You find yourself in a cramped tomb. The floor, walls, and ceiling are lined with cobblestone. An open coffin lies ahead. Marking are on the wall behind."),
+			action("look coffin","The coffin is wooden, with large brass hinges. Strangely enough, there is a lock on top of the lid. Scratch marks line the surface."),
+			action("look wall","The writing are in latin, but you understand the general message."),
+			action("Check coffin","You look inside the coffin and find... a key headed with a small skull.",{{"has_key3",true}},{{"has_key3",false}},{{"has_key3","You look inside the coffin and find... nothing"}}),
+	),
+	scenario(
+		"",
+		{
 			action("look around","The shed has bleak stone walls. On the left is a bed, where the gravekeeper sleeps. To the right is a desk"),
 			action("look desk","The desk is large and has many drawers built into it. On top of it is a crumpled note with many tear marks"),
 			action("read note","The note reads: 'October 12: There are many ill forces at work on these grounds. Today the heretic Hagatha's grave was unearthed in a most unnatural fashion. I saw only a struck of lightning, and not long after, she emerged from hell."),
@@ -281,6 +345,7 @@ vector<scenario> scenarios = {
 			action("check drawer","Inside the drawer you find the shovel you gave him. You decide to borrow it once again",{{"has_shovel",true}},-1,{{"has_shovel",false}},{{"has_shovel","There's nothing else there"}}),
 			action("check bed","The bed and its sheets are modest at best. The mattress is suspended high above the ground by its supports"),
 			action("check under bed","You look under the bed and find the second half of the note. It reads: 'October 3, On the request of good duke Louis of Quelqueparte, the late king Phillip II has been buried in this small yard, on account of the civil unrest his reign bred that may stir temptations to desecrate his body, or steal the many regal ornaments his attire dons upon him"),
+			action("*go south","",{{}},10)
 		}
 	),
 	scenario(
@@ -296,10 +361,32 @@ vector<scenario> scenarios = {
 			action("look around","You see three slender houses fit tightly down the lane. The one on the left has a mailbox and a fine finish. The one on the left is tattered, and the door is heavily splintered. The middle is in modest condition. On the other side of the street you a store with a sign on it. Down towards the end of the street east is the base of a large clocktower."),
 			action("look houses","The residencies have a humble appearance. Thatched-roofs shelter the single story, and the windows panes are imbued with dust and grime."),
 			action("go middle house",""),
-			action("look sign","The sign is gone",{{}},-1,{{"fixed_clock",true}},{{"fixed_clock","The sign says: 'Store opens at noon'"),
+			action("look sign","The sign is gone",{{}},-1,{{"fixed_clock",true}},{{"fixed_clock","The sign says: 'Store opens at noon'"}}),
 			action("look tower","The tower stands some thirty meters high. is made of a smootly-finished cobblestone. The face of the clock is a marvel of calligraphic art, with arching and spiralling beams signifying and decorating the hours and the hands."),
 			action("(look clock/check time)","The hands of the clock wind slowly and with the frailty of an old man",{{}},-1,{{"fixed_clock",true}},{{"fixed_clock","The time is 11:45 AM. There is no hand to count seconds, but when staring at it you find that the time passes very slowly, if at all."}}),
 			action("*go (west/clocktower)","",{{}},99,{{"opened_door2",true}},{{"opened_door2","The door to the clocktower is locked"}}),
+			action("*go east","",{{}},5)
+		}
+	),
+	scenario(
+		"",
+		{
+			action("look around","After climbing a helix of stairs, you find yourself immersed in the mechanism of the clocktower. The symphonic clicking and grinding of gears and cogs fills your eardrums. The interior is dark, save for a band of light emanating from the face of the clock. In a nest of gears directly behind the face, you spot a mallet encroached inside the machine."),
+			action("*go east","",{{}},11),
+			action("get mallet","You pick up the mallet",{{"has_mallet",true}},-1,{{"fixed_clock",true},{"has_mallet",false}},{{"has_mallet","You already have that"},{"fixed_clock","The mallet is too far out of reach to grasp for"}}),
+			action("throw stones mallet","You heave a hefty rock at the mallet. By virtue of your throwing ability you are able to dislodge the mallet. It falls to the ground, creating a cascade of noise as it knocks against one gear to another.",{{"fixed_clock",true}},-1,{{"fixed_clock",false}},{{"fixed_clock","You already have that"}}),
+		}
+	),
+	scenario(
+		"",
+		{
+			action("look around","You find yourself inside the run-down house."),
+		}
+	),
+	scenario(
+		"",
+		{
+			action("look around","You find yourself inside the next house over."),
 		}
 	)
 };
