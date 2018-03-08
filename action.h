@@ -17,10 +17,11 @@ class action {
 	int scene_change;
 	vector<pair<string,bool>> a_conditions;
 	map<string,string> a_fails;
+	int a_score;
 	string play_sequence(string);
 	string play_death(string);
 	public:
-		action(const string&,const string&,map<string,bool> c={},int=-1,vector<pair<string,bool>> d={},map<string,string> f={});
+		action(const string&,const string&,map<string,bool> c={},int=-1,vector<pair<string,bool>> d={},map<string,string> f={}, int=0);
 		string init_result();
 		string get_action_trigger();
 		void set_action_trigger(string);
