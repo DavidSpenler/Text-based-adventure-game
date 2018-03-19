@@ -26,7 +26,6 @@ string action::init_result() {
 	string response = success_desc;
 	bool valid = true;
 	for (unsigned int i=0; i < a_conditions.size(); i++) {
-		cout << a_conditions[i].first << a_conditions[i].second << endl;
 		if (conditions[a_conditions[i].first] != a_conditions[i].second) {
 			response = a_fails[a_conditions[i].first];
 			valid = false;

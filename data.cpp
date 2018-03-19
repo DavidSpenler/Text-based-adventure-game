@@ -91,6 +91,7 @@ vector<vector<string>> synonyms = {
 	{"sword","dagger"},
 	{"jehovah","Jehovah"},
 	{"cut"},
+	{"gears","gear"},
 	{"brooch","badge"},
 	{"say","speak","yell"},
 	{"coffin"},
@@ -107,7 +108,7 @@ vector<vector<string>> synonyms = {
 	{"skull"},
 	{"lock"},
 	{"smash","hit"},
-	{"seeds","bag"},
+	{"seeds","bag","seed"},
 	{"francs","franc","money"},
 	{"chest","trunk"},
 	{"flint"},
@@ -120,7 +121,9 @@ vector<vector<string>> synonyms = {
 	{"stump"},
 	{"chandelier"},
 	{"crown"},
-	{"jewel"}
+	{"jewel"},
+	{"words","word"},
+	{"shopkeeper","shopkeep","merchant"}
 };
 
 map<string,bool> conditions = {
@@ -227,7 +230,7 @@ vector<scenario> scenarios = {
 			action("look skeleton","The skeleton is composed of very long and thick bones"),
 			action("look chamberpot","The chamberpot is dark and round, with a prominent lip."),
 			action("get bone *skeleton","you pry a bone from the rib-cage of the skeleton",{{"has_bone",true}},-1,{{"has_bone",false}},{{"has_bone","You see no need to get another bone"}},1),
-			action("get chamberpot","You grab the chamber pot. Luckily, it's empty.",{{"has_chamberpot",true}},-1,{{"has_chamberpot",false}},{{"has_chamberpot","You already have that."}},1),
+			action("get chamberpot","You grab the chamber pot. Luckily, it's empty.",{{"has_chamberpot",true}},-1,{{"has_chamberpot",false},{"broke_cuffs",true}},{{"has_chamberpot","You already have that."},{"broke_cuffs","The pot is just out of reach"}},1),
 			action("get skeleton","The skeleton is much too large to carry in its entirety"),
 			action("stop wall with bone","You wait until the walls draw nearer and wedge the bone between them. The very resiliant bone keeps them from moving further",{{"used_bone",true},{"has_bone",false}},-1,{{"has_bone",true}},{{"has_bone","you don't have that."}},1),
 			action("use bone *stop wall","You wait until the walls draw nearer and wedge the bone between them. The very resiliant bone keeps them from moving further",{{"used_bone",true},{"has_bone",false}},-1,{{"has_bone",true}},{{"has_bone","You don't have that."}},1),
@@ -426,12 +429,13 @@ vector<scenario> scenarios = {
 		//14
 		"",
 		{
-			action("look around","You find yourself in a desolate grave yard. In the centre of the field is the abbey, to the north, on top of which crouches a menacing gargoyle. To the left is a tombstone which appears to have been dug up. A crooked tree stands tall next to it, and the wind howls through its branches. To the right are a number of other gravestones. A gravekeeper skulks around tiredly.",{},-1,{{"in_tree",false}},{{"in_tree","You see the field dotted with small gravestones. On the roof of the abbey, you see the gargoyle in all its fearsomenes. Below it are words written along the buttresses of the building"}}),
-			action("look abbey","The abbey is made with modest materials, but with passionate craftsmanship. The arched door has large brass hinges, and the stone rim is marked with many spiralling and tapering designs. the roof features impressive buttresses made of finely chiseled stone",{},-1,{{"in_tree",false}},{{"in_tree","You see words engraved deeply on the roof top 'LET THE HEAVENS WEEP TO THE CALL OF JEHOVAH"}}),
-			action("say jehovah","|With a pensive expression, you loudly utter the lord's name. As your lips close, the scene falls silent.|Suddenly, a flash of lightning shakes the earth. In an instant, the skies are imbued with clouds and the thick sheet of rainfall. Running, you seek shelter under the tree.| After several minutes, the storm abruptly stops. Sunlight bursts into the scene once again.",{{"said_words",true}},-1,{{"said_words",false}},{{"said_words","You prefer not to invoke the wrath of the lord a second time"}},1),
+			action("look around","You find yourself in a desolate grave yard. In the centre of the field is the abbey, to the north, on top of which crouches a menacing gargoyle. To the left is a tombstone which appears to have been dug up. A crooked tree stands tall next to it, and the wind howls through its branches. To the right are a number of other gravestones. A gravekeeper skulks around tiredly.",{},-1,{{"gave_shovel",false},{"in_tree",false}},{{"in_tree","You see the field dotted with small gravestones. On the roof of the abbey, you see the gargoyle in all its fearsomenes. Below it are words written along the buttresses of the building"},{"gave_shovel","You find yourself in a desolate grave yard. In the centre of the field is the abbey, to the north, on top of which crouches a menacing gargoyle. To the left is a tombstone which appears to have been dug up. A crooked tree stands tall next to it, and the wind howls through its branches. To the right are a number of other gravestones."}}),
+			action("look (abbey/words)","The abbey is made with modest materials, but with passionate craftsmanship. The arched door has large brass hinges, and the stone rim is marked with many spiralling and tapering designs. the roof features impressive buttresses made of finely chiseled stone",{},-1,{{"in_tree",false}},{{"in_tree","You see words engraved deeply on the roof top 'LET THE HEAVENS WEEP TO THE CALL OF JEHOVAH"}}),
+			action("say jehovah","|With a pensive expression, you loudly utter the lord's name. As your lips close, the scene falls silent.|Suddenly, a flash of lightning shakes the earth. In an instant, the skies are imbued with clouds and the thick sheet of rainfall. Running, you seek shelter under the tree.| After several minutes, the storm abruptly stops. Sunlight bursts into the scene once again.",{{"said_words",true},{"in_tree",false}},-1,{{"said_words",false}},{{"said_words","You prefer not to invoke the wrath of the lord a second time"}},1),
 			action("look tombstone","The tombstone is tall and decored with wonderful arches and architectural details. Atop the grave you read the following: 'Here lies the wretch, GENEVIEVE of HAGATHA, ?-1220. May she rot in the deepest circle of hell alongside Judas' Immediately below it appears as though the ground was unearthed with great fervour.",{{"read_name",true}},-1,{{"said_words",true}},{{"said_words","The tombstone is tall and decored with wonderful arches and architectural details. Atop where the name and date would logically reside there is a thick layer of dirt. Immediately below it appears as though the ground was unearthed with great fervour."}},1),
 			action("look tree","The tree resembles a witherig old man with an unsteady gait. A nook in its centre peers at you. Swinging in the cool breeze is a creaking lantern with an unlit candle."),
 			action("look grave","These graves are more modest. Attest to the lives of many men who primarily lived in the last century. Among their names are: GALEN GARNIER ALIENOR FRANCOIS, PHILIP BOURBON II"),
+			action("look gravekeeper","The poor wretch looks better fit to reside under the ground than upon it. He walks in an obscene hunch, and his arms hang pitifully with despair. You try not to glance at him often, but at least once already your gazes have met."),
 			action("look hole","The approach the hole and peer into it. The extent of it is much deeper than you had thought. Down into the earth your observe claw marks along the cobble-stone walls"),
 			action("*go west","",{},5),
 			action("(go abbey/go north)","",{{}},16,{{"gave_shovel",true}},{{"gave_shovel","It's locked"}}),
@@ -465,19 +469,11 @@ vector<scenario> scenarios = {
 			action("read note","The note reads: 'October 12: There are many ill forces at work on these grounds. Today the heretic Hagatha's grave was unearthed in a most unnatural fashion. I saw only a struck of lightning, and not long after, she emerged from hell."),
 			action("get note","You don't need it"),
 			action("check (drawer/desk)","You check the drawers and find the second half of the note. It reads: 'October 3, On the request of good baron of St. Aliquis, the late king Phillip II has been buried in this small yard, on account of the civil unrest his reign bred that may stir temptations to desecrate his body, or steal the many regal ornaments his attire dons upon him'"),
-			action("check bed","The bed and its sheets are modest at best. The mattress is suspended high above the ground by its supports"),
+			action("(look/check) bed","The bed and its sheets are modest at best. The mattress is suspended high above the ground by its supports"),
 			action("(look/check) under bed","You check under the bed and find the shovel you gave him. You decide to borrow it once again",{{"has_shovel",true}},-1,{{"has_shovel",false}},{{"has_shovel","There's nothing else there"}},1),
 			action("*go south","",{{}},14)
 		}
 	),
-	/*scenario(
-		//17
-		"",
-		{
-			action("flip lever","You flip the lever ON",{{"lever_on",true}},-1,{{"lever_on",false}},{{"lever_on","_next_"}},1),
-			action("flip lever","You flip the lever OFF",{{"lever_on",false}},-1,{{"lever_on",true}},{{"lever_on","_next_"}},1)
-		}
-	),*/
 	scenario(
 		//17
 		"",
@@ -503,6 +499,7 @@ vector<scenario> scenarios = {
 		"",
 		{
 			action("look around","After climbing a helix of stairs, you find yourself immersed in the mechanism of the clocktower. The symphonic clicking and grinding of gears and cogs fills your eardrums. The interior is dark, save for a band of light emanating from the face of the clock. In a nest of gears directly behind the face, you spot a mallet encroached inside the machine.",{{}},-1,{{"has_mallet",false},{"fixed_clocks",false}},{{"has_mallet","After climbing a helix of stairs, you find yourself immersed in the mechanism of the clocktower. The symphonic clicking and grinding of gears and cogs fills your eardrums. The interior is dark, save for a band of light emanating from the face of the clock. A mallet lies on the platform before you"},{"fixed_clock","After climbing a helix of stairs, you find yourself immersed in the mechanism of the clocktower. The symphonic clicking and grinding of gears and cogs fills your eardrums."}}),
+			action("look gears","The gears fit the description as such only loosely. Their shape is assymmetric, many with teeth to thin or too fat. Unsurprisingly, they cry with great fervour as they turn."),
 			action("*go east","",{{}},17),
 			action("get mallet","You pick up the mallet",{{"has_mallet",true}},-1,{{"fixed_clock",true},{"has_mallet",false}},{{"has_mallet","You already have that"},{"fixed_clock","The mallet is too far out of reach to grasp for"}},1),
 			action("throw stones mallet","You heave a hefty rock at the mallet. By virtue of your throwing ability you are able to dislodge the mallet. It falls to the ground, creating a cascade of noise as it knocks against one gear to another.",{{"fixed_clock",true}},-1,{{"fixed_clock",false}},{{"fixed_clock","You already have that"}},1)

@@ -152,6 +152,7 @@ string scenario::take_action(string action) {
 		string item = iterator->first;
 		replace(item.begin(),item.end(),'_',' ');
 		if (core_action == "look "+item && conditions["has_"+iterator->first] == true) {
+			cout << "Dungeon Quest\tScore: "+to_string(score)+"/48\n\n'";
 			return inventory[iterator->first];
 		}
 	}
